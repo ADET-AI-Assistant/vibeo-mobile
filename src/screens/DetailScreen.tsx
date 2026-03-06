@@ -8,17 +8,15 @@ import {
     TouchableOpacity,
     ImageBackground,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, MessageCircle } from 'lucide-react-native';
 import { getImageUrl } from '../api/tmdb';
 import { getFanartLogoUrl } from '../api/fanart';
 import { useAddToWatchlist, useRemoveFromWatchlist, useWatchlist } from '../hooks/useFirestore';
 import { WatchlistItem } from '../types/user';
 import { getMediaTitle, getMediaType, getMediaYear } from '../utils/media';
+import { AppHeader } from '../components/AppHeader';
 
 const DetailScreen = ({ route, navigation }: any) => {
     const { item } = route.params;
-    const insets = useSafeAreaInsets();
 
     const title = getMediaTitle(item);
     const year = getMediaYear(item);
@@ -82,14 +80,15 @@ const DetailScreen = ({ route, navigation }: any) => {
                     <View style={styles.heroOverlayStrong} />
                     <View style={styles.heroOverlaySoft} />
 
-                    <TouchableOpacity
-                        style={[styles.backButton, { top: insets.top + 8 }]}
-                        onPress={() => navigation.goBack()}
-                        activeOpacity={0.85}
-                    >
-                        <ArrowLeft color="#f7eff4" size={18} />
-                        <Text style={styles.backButtonText}>Back</Text>
-                    </TouchableOpacity>
+                    <AppHeader
+                        showBack
+                        onBackPress={() => navigation.goBack()}
+                        showSearch={false}
+                        showMenu={false}
+                        transparent
+                        withBorder={false}
+                        style={styles.heroHeader}
+                    />
 
                     {posterUrl ? <Image source={{ uri: posterUrl }} style={styles.floatingPoster} /> : null}
                 </ImageBackground>
@@ -135,9 +134,6 @@ const DetailScreen = ({ route, navigation }: any) => {
                 </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.fab} activeOpacity={0.9}>
-                <MessageCircle color="#ffd3e4" size={22} />
-            </TouchableOpacity>
         </ScrollView>
     );
 };
@@ -149,6 +145,12 @@ const styles = StyleSheet.create({
     },
     heroContainer: {
         height: 465,
+    },
+    heroHeader: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
     },
     backdrop: {
         flex: 1,
@@ -165,21 +167,6 @@ const styles = StyleSheet.create({
     heroOverlaySoft: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'rgba(60, 5, 45, 0.18)',
-    },
-    backButton: {
-        position: 'absolute',
-        left: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 20,
-        backgroundColor: 'rgba(20, 13, 24, 0.74)',
-    },
-    backButtonText: {
-        color: '#f7eff4',
-        fontWeight: '700',
     },
     floatingPoster: {
         width: 142,
@@ -279,19 +266,6 @@ const styles = StyleSheet.create({
         color: '#f7edf3',
         fontWeight: '800',
         fontSize: 15,
-    },
-    fab: {
-        position: 'absolute',
-        right: 18,
-        bottom: 24,
-        width: 58,
-        height: 58,
-        borderRadius: 29,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#ff3f75',
-        borderWidth: 2,
-        borderColor: '#ff7397',
     },
 });
 

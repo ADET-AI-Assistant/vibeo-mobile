@@ -8,17 +8,15 @@ import {
     Image,
     ActivityIndicator,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Menu, Search, MessageCircle } from 'lucide-react-native';
 import { useAuth } from '../store/AuthContext';
 import { useWatchlist, useHistory } from '../hooks/useFirestore';
 import { getImageUrl } from '../api/tmdb';
+import { AppHeader } from '../components/AppHeader';
 
 type LibraryTab = 'all' | 'watching' | 'planning' | 'completed' | 'on_hold';
 
 const ProfileScreen = ({ navigation }: any) => {
     const { user, logout } = useAuth();
-    const insets = useSafeAreaInsets();
     const [activeTab, setActiveTab] = useState<LibraryTab>('all');
 
     const { data: watchlist, isLoading: loadingWatchlist } = useWatchlist();
@@ -78,18 +76,12 @@ const ProfileScreen = ({ navigation }: any) => {
     );
 
     return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={[styles.contentContainer, { paddingTop: insets.top + 6 }]}
-            showsVerticalScrollIndicator={false}
-        >
-            <View style={styles.topBar}>
-                <Text style={styles.brand}>Vibeo</Text>
-                <View style={styles.topActions}>
-                    <Search color="#bda9b7" size={20} />
-                    <Menu color="#f2eaf0" size={24} />
-                </View>
-            </View>
+        <View style={styles.container}>
+            <AppHeader />
+            <ScrollView
+                contentContainerStyle={styles.contentContainer}
+                showsVerticalScrollIndicator={false}
+            >
 
             <View style={styles.profileCard}>
                 <View style={styles.avatarOuter}>
@@ -176,10 +168,8 @@ const ProfileScreen = ({ navigation }: any) => {
                 <Text style={styles.signOutText}>Sign Out</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.fab} activeOpacity={0.9}>
-                <MessageCircle color="#ffd3e4" size={22} />
-            </TouchableOpacity>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 };
 
@@ -190,25 +180,6 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         paddingBottom: 120,
-    },
-    topBar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingBottom: 14,
-        borderBottomWidth: 1,
-        borderBottomColor: '#2f1122',
-    },
-    brand: {
-        color: '#ff4f79',
-        fontSize: 30 / 2,
-        fontWeight: '900',
-    },
-    topActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 14,
     },
     profileCard: {
         marginHorizontal: 16,
@@ -398,19 +369,6 @@ const styles = StyleSheet.create({
         color: '#ffeaf2',
         fontWeight: '800',
         fontSize: 14,
-    },
-    fab: {
-        position: 'absolute',
-        right: 18,
-        bottom: 24,
-        width: 58,
-        height: 58,
-        borderRadius: 29,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#ff3f75',
-        borderWidth: 2,
-        borderColor: '#ff7397',
     },
 });
 

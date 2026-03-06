@@ -10,11 +10,10 @@ import {
     ActivityIndicator,
     ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../store/AuthContext';
+import { AppHeader } from '../components/AppHeader';
 
 const LoginScreen = () => {
-    const insets = useSafeAreaInsets();
     const { login, register } = useAuth();
 
     const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -59,9 +58,9 @@ const LoginScreen = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={styles.root}
         >
-            <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 26 }]}>
+            <AppHeader showSearch={false} showMenu={false} withBorder={false} />
+            <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.heroBlob} />
-                <Text style={styles.brand}>Vibeo</Text>
                 <Text style={styles.heading}>Stream darker, bolder cinema.</Text>
                 <Text style={styles.subheading}>Sign in or create an account to sync your watchlist and history.</Text>
 
@@ -146,6 +145,7 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         paddingHorizontal: 18,
+        paddingTop: 20,
         paddingBottom: 30,
         backgroundColor: '#10010b',
     },
@@ -157,12 +157,6 @@ const styles = StyleSheet.create({
         height: 340,
         borderRadius: 999,
         backgroundColor: 'rgba(255, 61, 123, 0.2)',
-    },
-    brand: {
-        color: '#ff4f79',
-        fontSize: 26,
-        fontWeight: '900',
-        marginBottom: 8,
     },
     heading: {
         color: '#fff4f8',

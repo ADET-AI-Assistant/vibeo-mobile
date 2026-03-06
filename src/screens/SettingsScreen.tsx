@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSettings } from '../store/SettingsContext';
+import { AppHeader } from '../components/AppHeader';
 
 const SettingsScreen = ({ navigation }: any) => {
     const { settings, updateSetting, clearStorage } = useSettings();
-    const insets = useSafeAreaInsets();
 
     const handleClearStorage = async () => {
         await clearStorage();
@@ -13,13 +12,16 @@ const SettingsScreen = ({ navigation }: any) => {
     };
 
     return (
-        <ScrollView style={[styles.container, { paddingTop: insets.top }]}> 
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Text style={styles.backButtonText}>Back</Text>
-                </TouchableOpacity>
-                <Text style={styles.title}>Settings</Text>
-            </View>
+        <View style={styles.container}>
+            <AppHeader
+                title="Settings"
+                showBrand={false}
+                showBack
+                onBackPress={() => navigation.goBack()}
+                showSearch={false}
+                showMenu={false}
+            />
+            <ScrollView>
 
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Appearance</Text>
@@ -74,7 +76,8 @@ const SettingsScreen = ({ navigation }: any) => {
                     <Text style={styles.infoValue}>1.0.0 (Expo)</Text>
                 </View>
             </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 };
 
@@ -82,28 +85,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#12030d',
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        marginBottom: 30,
-        position: 'relative',
-        justifyContent: 'center',
-    },
-    backButton: {
-        position: 'absolute',
-        left: 20,
-        padding: 8,
-    },
-    backButtonText: {
-        color: '#fff',
-        fontSize: 16,
-    },
-    title: {
-        color: '#fff',
-        fontSize: 20,
-        fontWeight: 'bold',
     },
     section: {
         marginBottom: 30,
