@@ -61,3 +61,11 @@ export const useMultiSearch = (query: string) => {
         enabled: query.length > 2, // Only fetch when query is > 2 characters
     });
 };
+
+export const useMovieGenresQuery = () => {
+    return useQuery({
+        queryKey: ['genres', 'movie'],
+        queryFn: () => tmdbApi.getGenres('movie'),
+        staleTime: 1000 * 60 * 60,
+    });
+};

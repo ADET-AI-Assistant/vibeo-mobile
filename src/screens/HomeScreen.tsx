@@ -14,19 +14,21 @@ import {
     Linking,
     Image,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { Menu, Search, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import {
     useTrendingQuery,
     useNowPlayingQuery,
     useTopRatedQuery,
+    usePopularQuery,
+    useUpcomingQuery,
 } from '../hooks/useTMDB';
 import { MediaCard } from '../components/MediaCard';
 import { Movie, TVShow } from '../types/tmdb';
 import { getImageUrl, tmdbApi } from '../api/tmdb';
 import { getFanartLogoUrl } from '../api/fanart';
 import { getMediaTitle, getMediaType, getMediaYear } from '../utils/media';
+import { AppHeader } from '../components/AppHeader';
 
 const MOODS = ['Exciting', 'Relaxing', 'Dark', 'Romantic', 'Comedy'];
 
@@ -37,11 +39,13 @@ const MediaRail = ({
     data,
     isLoading,
     onNavigate,
+    onSeeAll,
 }: {
     title: string;
     data: any[];
     isLoading: boolean;
     onNavigate: (item: Movie | TVShow) => void;
+    onSeeAll: () => void;
 }) => {
     if (isLoading) {
         return (
@@ -60,7 +64,7 @@ const MediaRail = ({
         <View style={styles.railContainer}>
             <View style={styles.railHeader}>
                 <Text style={styles.railTitle}>{title}</Text>
-                <TouchableOpacity activeOpacity={0.8}>
+                <TouchableOpacity activeOpacity={0.8} onPress={onSeeAll}>
                     <Text style={styles.seeAll}>See All</Text>
                 </TouchableOpacity>
             </View>
@@ -77,7 +81,6 @@ const MediaRail = ({
 };
 
 const HomeScreen = () => {
-    const insets = useSafeAreaInsets();
     const navigation = useNavigation<any>();
     const { width } = useWindowDimensions();
     const heroListRef = useRef<FlatList<HeroMedia>>(null);
@@ -85,6 +88,8 @@ const HomeScreen = () => {
     const trending = useTrendingQuery();
     const nowPlaying = useNowPlayingQuery();
     const topRated = useTopRatedQuery();
+    const popular = usePopularQuery();
+    const upcoming = useUpcomingQuery();
 
     const [activeHeroIndex, setActiveHeroIndex] = useState(0);
     const [trailerKeys, setTrailerKeys] = useState<Record<number, string | null>>({});
@@ -174,6 +179,9 @@ const HomeScreen = () => {
     const handleCardPress = (item: Movie | TVShow) => {
         navigation.navigate('Detail', { item });
     };
+    const handleSeeAllPress = () => {
+        navigation.navigate('Browse');
+    };
 
     const handleHeroScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         const offsetX = event.nativeEvent.contentOffset.x;
@@ -203,18 +211,12 @@ const HomeScreen = () => {
     const heroCardWidth = width;
 
     return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={[styles.contentContainer, { paddingTop: insets.top }]}
-            showsVerticalScrollIndicator={false}
-        >
-            <View style={styles.header}>
-                <Text style={styles.brand}>Vibeo</Text>
-                <View style={styles.headerActions}>
-                    <Search color="#b4a2b2" size={20} />
-                    <Menu color="#f0e7ee" size={26} />
-                </View>
-            </View>
+        <View style={styles.container}>
+            <AppHeader />
+            <ScrollView
+                contentContainerStyle={styles.contentContainer}
+                showsVerticalScrollIndicator={false}
+            >
 
             {heroItems.length > 0 ? (
                 <View style={styles.heroCarouselWrap}>
@@ -334,6 +336,7 @@ const HomeScreen = () => {
                 data={trending.data?.pages[0]?.results || []}
                 isLoading={trending.isLoading}
                 onNavigate={handleCardPress}
+                onSeeAll={handleSeeAllPress}
             />
 
             <MediaRail
@@ -341,6 +344,7 @@ const HomeScreen = () => {
                 data={nowPlaying.data?.pages[0]?.results || []}
                 isLoading={nowPlaying.isLoading}
                 onNavigate={handleCardPress}
+                onSeeAll={handleSeeAllPress}
             />
 
             <MediaRail
@@ -348,12 +352,27 @@ const HomeScreen = () => {
                 data={topRated.data?.pages[0]?.results || []}
                 isLoading={topRated.isLoading}
                 onNavigate={handleCardPress}
+                onSeeAll={handleSeeAllPress}
             />
 
-            <TouchableOpacity style={styles.fab} activeOpacity={0.9}>
-                <MessageCircle color="#ffd3e4" size={22} />
-            </TouchableOpacity>
-        </ScrollView>
+            <MediaRail
+                title="Popular Worldwide"
+                data={popular.data?.pages[0]?.results || []}
+                isLoading={popular.isLoading}
+                onNavigate={handleCardPress}
+                onSeeAll={handleSeeAllPress}
+            />
+
+            <MediaRail
+                title="Coming Soon"
+                data={upcoming.data?.pages[0]?.results || []}
+                isLoading={upcoming.isLoading}
+                onNavigate={handleCardPress}
+                onSeeAll={handleSeeAllPress}
+            />
+
+            </ScrollView>
+        </View>
     );
 };
 
@@ -364,23 +383,6 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         paddingBottom: 104,
-    },
-    header: {
-        paddingHorizontal: 18,
-        paddingBottom: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    brand: {
-        color: '#ff4f74',
-        fontSize: 31 / 2,
-        fontWeight: '800',
-    },
-    headerActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 18,
     },
     heroCarouselWrap: {
         marginBottom: 8,
@@ -425,6 +427,8 @@ const styles = StyleSheet.create({
     heroTitleLogo: {
         width: '88%',
         height: 72,
+        alignSelf: 'flex-start',
+        marginLeft: -70,
         marginBottom: 8,
     },
     heroMeta: {
@@ -566,19 +570,6 @@ const styles = StyleSheet.create({
     loader: {
         alignSelf: 'flex-start',
         marginLeft: 14,
-    },
-    fab: {
-        position: 'absolute',
-        right: 18,
-        bottom: 24,
-        width: 58,
-        height: 58,
-        borderRadius: 29,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#ff3f75',
-        borderWidth: 2,
-        borderColor: '#ff7397',
     },
 });
 
