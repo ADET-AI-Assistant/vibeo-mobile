@@ -4,7 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import BrowseScreen from '../screens/BrowseScreen';
-import { Home, Search, Compass, User } from 'lucide-react-native';
+import { Home, Sparkles, Compass, User } from 'lucide-react-native';
 
 const Tab = createBottomTabNavigator();
 
@@ -42,10 +42,10 @@ const TabNavigator = () => {
                 }}
             />
             <Tab.Screen
-                name="Search"
+                name="Vibey"
                 component={SearchScreen}
                 options={{
-                    tabBarIcon: ({ color, size }) => <Search color={color} size={size} />,
+                    tabBarIcon: ({ color, size }) => <Sparkles color={color} size={size} />,
                 }}
             />
             <Tab.Screen
