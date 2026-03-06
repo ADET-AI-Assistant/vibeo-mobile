@@ -31,7 +31,10 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
+.env.*
 .env*.local
+!.env.example
 
 # typescript
 *.tsbuildinfo
@@ -39,3 +42,11 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Convex
+.convex/
+convex/_generated/
+
+# Convex
+.convex/
+convex/_generated/
