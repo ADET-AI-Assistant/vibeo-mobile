@@ -4,7 +4,8 @@ import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import BrowseScreen from '../screens/BrowseScreen';
-import { Home, Sparkles, Compass, User } from 'lucide-react-native';
+import LeaderboardScreen from '../screens/LeaderboardScreen';
+import { Home, Sparkles, Compass, User, Trophy } from 'lucide-react-native';
 
 const Tab = createBottomTabNavigator();
 
@@ -46,6 +47,13 @@ const TabNavigator = () => {
                 component={SearchScreen}
                 options={{
                     tabBarIcon: ({ color, size }) => <Sparkles color={color} size={size} />,
+                }}
+            />
+            <Tab.Screen
+                name="Rank"
+                component={LeaderboardScreen}
+                options={{
+                    tabBarIcon: ({ color, size }) => <Trophy color={color} size={size} />,
                 }}
             />
             <Tab.Screen
