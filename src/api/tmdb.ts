@@ -4,15 +4,20 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
 const fetchFromTMDB = async <T>(endpoint: string, params: Record<string, string> = {}): Promise<T> => {
+    if (!TMDB_API_KEY) {
+        throw new Error('TMDB API key is missing. Check your .env.local file.');
+    }
+
     const queryParams = new URLSearchParams({
-        api_key: TMDB_API_KEY || '',
+        api_key: TMDB_API_KEY,
         ...params,
     });
 
     const response = await fetch(`${TMDB_BASE_URL}${endpoint}?${queryParams}`);
 
     if (!response.ok) {
-        throw new Error(`Failed to fetch from TMDB: ${response.statusText}`);
+        const body = await response.text().catch(() => '');
+        throw new Error(`TMDB error ${response.status}: ${body || response.statusText || 'Unknown error'}`);
     }
 
     return response.json();
