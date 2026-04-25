@@ -91,6 +91,33 @@ const HomeScreen = () => {
     const popular = usePopularQuery();
     const upcoming = useUpcomingQuery();
 
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        let timeout: NodeJS.Timeout;
+        const isAnyLoading = trending.isLoading || nowPlaying.isLoading || topRated.isLoading || popular.isLoading || upcoming.isLoading;
+        const isAnyError = trending.isError || nowPlaying.isError || topRated.isError || popular.isError || upcoming.isError;
+        
+        if (isAnyError) {
+            const errorObj = trending.error || nowPlaying.error || topRated.error || popular.error || upcoming.error;
+            setToastMessage(`Error: ${errorObj?.message || 'Unable to fetch data'}`);
+        } else if (isAnyLoading) {
+            timeout = setTimeout(() => {
+                setToastMessage("Slow internet connection or server unreachable. Please wait...");
+            }, 6000);
+        } else {
+            setToastMessage(null);
+        }
+
+        return () => clearTimeout(timeout);
+    }, [
+        trending.isLoading, trending.isError, trending.error,
+        nowPlaying.isLoading, nowPlaying.isError, nowPlaying.error,
+        topRated.isLoading, topRated.isError, topRated.error,
+        popular.isLoading, popular.isError, popular.error,
+        upcoming.isLoading, upcoming.isError, upcoming.error,
+    ]);
+
     const [activeHeroIndex, setActiveHeroIndex] = useState(0);
     const [trailerKeys, setTrailerKeys] = useState<Record<number, string | null>>({});
     const [heroLogoMap, setHeroLogoMap] = useState<Record<number, string | null>>({});
@@ -372,6 +399,15 @@ const HomeScreen = () => {
             />
 
             </ScrollView>
+
+            {toastMessage && (
+                <View style={styles.toastContainer}>
+                    <Text style={styles.toastText}>{toastMessage}</Text>
+                    <TouchableOpacity onPress={() => setToastMessage(null)} style={styles.toastClose}>
+                        <Text style={styles.toastCloseText}>×</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
 };
@@ -570,6 +606,40 @@ const styles = StyleSheet.create({
     loader: {
         alignSelf: 'flex-start',
         marginLeft: 14,
+    },
+    toastContainer: {
+        position: 'absolute',
+        bottom: 110,
+        left: 20,
+        right: 20,
+        backgroundColor: 'rgba(219, 45, 78, 0.95)',
+        padding: 16,
+        borderRadius: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 6,
+        zIndex: 1000,
+    },
+    toastText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '600',
+        flex: 1,
+        marginRight: 10,
+    },
+    toastClose: {
+        padding: 4,
+    },
+    toastCloseText: {
+        color: '#fff',
+        fontSize: 24,
+        fontWeight: 'bold',
+        lineHeight: 24,
     },
 });
 
