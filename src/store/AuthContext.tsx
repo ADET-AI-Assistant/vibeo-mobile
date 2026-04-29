@@ -12,7 +12,7 @@ interface AuthContextType {
   token: string | null;
   djangoToken: string | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   register: (
     email: string,
     password: string,
@@ -57,42 +57,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     bootstrap();
   }, []);
 
-  // login takes email again for Convex, but also tries Django with username field
+  // email → Convex, derived username → Django
   const login = async (email: string, password: string) => {
-    const convexSession = await convexApi.login(email, password);
-    setUser(convexSession.user);
-    setToken(convexSession.token);
-
-    // Django login — try with email prefix as username
+    // Django uses username derived from email
     try {
-      const username = email.split("@")[0];
+      const username = email.includes("@") ? email.split("@")[0] : email;
       const djangoData = await djangoLogin(username, password);
       setDjangoToken(djangoData.token);
     } catch (e) {
-      console.warn("Django login failed (non-blocking):", e);
+      if (__DEV__) console.warn("Django login failed (non-blocking):", e);
     }
+
+    // Convex uses email — this is the primary auth
+    const convexSession = await convexApi.login(email, password);
+    setUser(convexSession.user);
+    setToken(convexSession.token);
   };
 
-  // Register collects both email and username
+  // Register: Django gets username explicitly, Convex gets email
   const register = async (
     email: string,
     password: string,
     username: string,
     name?: string,
   ) => {
+    // Django registration — non-blocking
     try {
-      // 1. Django FIRST
       const djangoData = await djangoRegister(email, password, username, name);
       setDjangoToken(djangoData.token);
-
-      // 2. Convex SECOND (non-blocking)
-      const convexSession = await convexApi.register(email, password, name);
-      setUser(convexSession.user);
-      setToken(convexSession.token);
     } catch (e) {
-      console.warn("Register error:", e);
-      throw e;
+      if (__DEV__) console.warn("Django register failed (non-blocking):", e);
     }
+
+    // Convex registration — primary, this must succeed
+    const convexSession = await convexApi.register(email, password, name);
+    setUser(convexSession.user);
+    setToken(convexSession.token);
   };
 
   const logout = async () => {

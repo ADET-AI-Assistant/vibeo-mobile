@@ -2,10 +2,9 @@
  * Django API Client for Vibeo Mobile
  * Handles DRF Token Authentication and all protected API requests.
  */
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BASE_URL = "http://192.168.50.24:8000/api/v1";
+const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL!;
 const AUTH_URL = `${BASE_URL}/auth`;
 const DJANGO_TOKEN_KEY = "django_auth_token";
 
@@ -39,7 +38,7 @@ const authHeaders = async (): Promise<Record<string, string>> => {
 export const djangoLogin = async (username: string, password: string) => {
   const response = await fetch(`${AUTH_URL}/login/`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json; charset=utf-8" },
     body: JSON.stringify({ username, password }),
   });
 
@@ -56,7 +55,8 @@ export const djangoLogin = async (username: string, password: string) => {
   }
 
   await storeDjangoToken(data.token);
-  console.log("✅ Django token stored:", data.token?.slice(0, 10) + "...");
+  if (__DEV__)
+    console.log("✅ Django token stored:", data.token?.slice(0, 10) + "...");
   return data;
 };
 
@@ -95,7 +95,8 @@ export const djangoRegister = async (
   }
 
   await storeDjangoToken(data.token);
-  console.log("✅ Django token stored:", data.token?.slice(0, 10) + "...");
+  if (__DEV__)
+    console.log("✅ Django token stored:", data.token?.slice(0, 10) + "...");
   return data;
 };
 

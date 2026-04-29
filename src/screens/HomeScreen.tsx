@@ -23,7 +23,6 @@ import {
   usePopularQuery,
   useUpcomingQuery,
 } from "../hooks/useTMDB";
-import { useAuth } from "../store/AuthContext";
 import { MediaCard } from "../components/MediaCard";
 import { Movie, TVShow } from "../types/tmdb";
 import { getImageUrl, tmdbApi } from "../api/tmdb";
@@ -87,7 +86,6 @@ const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const { width } = useWindowDimensions();
   const heroListRef = useRef<FlatList<HeroMedia>>(null);
-  const { djangoToken } = useAuth();
 
   const trending = useTrendingQuery();
   const nowPlaying = useNowPlayingQuery();

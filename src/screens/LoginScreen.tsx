@@ -36,23 +36,20 @@ const LoginScreen = () => {
 
     try {
       if (mode === "login") {
-        if (!username || !password) {
-          setErrorText("Username and password are required.");
+        if (!email || !password) {
+          setErrorText("Email and password are required.");
           return;
         }
-
-        await login(username.trim(), password);
+        await login(email.trim(), password);
       } else {
         if (!username || !email || !password) {
           setErrorText("Username, email, and password are required.");
           return;
         }
-
         if (password !== confirmPassword) {
           setErrorText("Passwords do not match.");
           return;
         }
-
         await register(
           email.trim(),
           password,
@@ -122,37 +119,39 @@ const LoginScreen = () => {
         </View>
 
         <View style={styles.card}>
-          {/* Username — shown in both login and register */}
+          {/* Register-only: username */}
+          {mode === "register" ? (
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              placeholderTextColor="#8f7388"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+            />
+          ) : null}
+
+          {/* Register-only: display name */}
+          {mode === "register" ? (
+            <TextInput
+              style={styles.input}
+              placeholder="Display Name (optional)"
+              placeholderTextColor="#8f7388"
+              value={name}
+              onChangeText={setName}
+            />
+          ) : null}
+
+          {/* Email — shown in both login and register */}
           <TextInput
             style={styles.input}
-            placeholder="Username"
+            placeholder="Email"
             placeholderTextColor="#8f7388"
-            value={username}
-            onChangeText={setUsername}
+            value={email}
+            onChangeText={setEmail}
             autoCapitalize="none"
+            keyboardType="email-address"
           />
-
-          {/* Register-only fields */}
-          {mode === "register" ? (
-            <>
-              <TextInput
-                style={styles.input}
-                placeholder="Display Name (optional)"
-                placeholderTextColor="#8f7388"
-                value={name}
-                onChangeText={setName}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor="#8f7388"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-              />
-            </>
-          ) : null}
 
           <TextInput
             style={styles.input}
