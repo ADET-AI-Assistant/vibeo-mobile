@@ -345,7 +345,7 @@ const HomeScreen = () => {
                           </Text>
                         )}
                         <Text style={styles.heroMeta}>
-                          {getMediaYear(item)} {item.vote_average.toFixed(1)}{" "}
+                          {getMediaYear(item)} {item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}{" "}
                           {getMediaType(item) === "movie" ? "HD" : "SERIES"}
                         </Text>
                         <Text style={styles.heroOverview} numberOfLines={3}>

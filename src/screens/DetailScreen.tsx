@@ -101,7 +101,7 @@ const DetailScreen = ({ route, navigation }: any) => {
                     <Text style={styles.title}>{title}</Text>
                 )}
                 <Text style={styles.metaText}>
-                    {year}   {item.vote_average.toFixed(1)}   {getMediaType(item) === 'movie' ? 'PG-13' : 'TV'}   HD
+                    {year}   {item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}   {getMediaType(item) === 'movie' ? 'PG-13' : 'TV'}   HD
                 </Text>
 
                 <View style={styles.tagRow}>

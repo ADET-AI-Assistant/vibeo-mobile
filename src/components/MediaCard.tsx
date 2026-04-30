@@ -38,7 +38,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
                     </View>
                 )}
                 <View style={styles.ratingBadge}>
-                    <Text style={styles.ratingText}>{item.vote_average.toFixed(1)}</Text>
+                    <Text style={styles.ratingText}>{item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}</Text>
                 </View>
             </View>
 
