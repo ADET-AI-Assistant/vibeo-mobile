@@ -57,6 +57,9 @@ export const tmdbApi = {
 
     getTVExternalIds: (id: number) =>
         fetchFromTMDB<{ id: number; tvdb_id: number | null; imdb_id: string | null }>(`/tv/${id}/external_ids`),
+
+    getDetails: (type: 'movie' | 'tv', id: number) =>
+        fetchFromTMDB<{ id: number; poster_path: string | null }>(`/${type}/${id}`),
 };
 
 export const getImageUrl = (path: string | null, size: 'w200' | 'w500' | 'original' = 'w500') => {
