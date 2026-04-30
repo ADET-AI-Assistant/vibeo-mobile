@@ -67,7 +67,13 @@ const ProfileScreen = ({ navigation }: any) => {
                 })
             }
         >
-            <Image source={{ uri: getImageUrl(item.posterPath, 'w500') || '' }} style={styles.posterImage} />
+            {getImageUrl(item.posterPath, 'w500') ? (
+                <Image source={{ uri: getImageUrl(item.posterPath, 'w500') as string }} style={styles.posterImage} />
+            ) : (
+                <View style={[styles.posterImage, { backgroundColor: '#382434', justifyContent: 'center', alignItems: 'center' }]}>
+                     <Text style={{color: '#bda2bc', fontSize: 10, fontWeight: '700'}}>NO IMG</Text>
+                </View>
+            )}
             <Text style={styles.posterTitle} numberOfLines={1}>
                 {item.title}
             </Text>
