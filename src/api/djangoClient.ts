@@ -5,7 +5,7 @@
 
 // Use the production URL because mobile device emulators cannot easily resolve 'localhost' 
 // to the host dev server without complicated network routing.
-const BASE_URL = 'http://192.168.1.9:8000/api/v1';
+const BASE_URL = 'https://vibeo-django-backend.vercel.app/api/v1';
 
 /**
  * Sync user stats to the Django backend
