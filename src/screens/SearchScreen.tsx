@@ -167,7 +167,7 @@ const VibeyScreen = () => {
                                                 {title}
                                             </Text>
                                             <Text style={styles.cardMeta}>
-                                                {year} - {item.vote_average.toFixed(1)} - {getMediaType(item).toUpperCase()}
+                                                {year} - {item.vote_average ? item.vote_average.toFixed(1) : 'N/A'} - {getMediaType(item).toUpperCase()}
                                             </Text>
                                             <Text style={styles.cardReason} numberOfLines={3}>
                                                 {result.reason}

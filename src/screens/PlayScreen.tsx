@@ -16,11 +16,13 @@ const PlayScreen = ({ route, navigation }: any) => {
 
     React.useEffect(() => {
         // Record that user played this item
+        const posterPath = item.poster_path || (item as any).posterPath || null;
+        console.log('[PlayScreen] Saving history with posterPath:', posterPath);
         const historyItem: HistoryItem = {
             mediaId: item.id,
             mediaType: item.media_type,
             title: title || 'Unknown',
-            posterPath: item.poster_path,
+            posterPath,
             lastWatchedAt: Date.now(),
             season,
             episode,

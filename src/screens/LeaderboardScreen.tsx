@@ -66,23 +66,9 @@ const LeaderboardScreen = () => {
         setSyncing(true);
         setSyncSuccess(false);
 
-        // Approximate total minutes based on generic formula (assume 3 mins per history item as fallback if not tracked)
-        // Wait, realistically they track full movies but we'll adapt from what ProfileScreen does.
-        const totalMinutes = Math.max(0, (history?.length || 0) * 3);
-        const totalWatchTimeInSeconds = totalMinutes * 60;
-
-        const mockStats = {
-            uid: user.uid,
-            displayName: user.name || user.email?.split('@')[0],
-            photoURL: '', // No photo URL tracked in current UserType usually
-            totalWatchTime: totalWatchTimeInSeconds,
-            streakData: { current: 1, highest: 1 } // Mock streak for now
-        };
-
         try {
-            await syncUserStats(mockStats);
-            setSyncSuccess(true);
             await loadLeaderboard();
+            setSyncSuccess(true);
             setTimeout(() => setSyncSuccess(false), 3000);
         } catch (err) {
             console.error('Manual sync failed:', err);
