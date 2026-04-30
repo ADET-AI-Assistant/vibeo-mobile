@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { convexApi } from '../api/convex';
+import { tmdbApi } from '../api/tmdb';
 import { useAuth } from '../store/AuthContext';
 import { WatchlistItem, HistoryItem } from '../types/user';
 
@@ -47,12 +48,30 @@ export const useRemoveFromWatchlist = () => {
     });
 };
 
+const enrichHistoryPosters = async (items: HistoryItem[]): Promise<HistoryItem[]> => {
+    const enriched = await Promise.all(
+        items.map(async (item) => {
+            if (item.posterPath) return item;
+            try {
+                const details = await tmdbApi.getDetails(item.mediaType, item.mediaId);
+                return { ...item, posterPath: details.poster_path };
+            } catch {
+                return item;
+            }
+        })
+    );
+    return enriched;
+};
+
 export const useHistory = () => {
     const { user, token } = useAuth();
 
     return useQuery({
         queryKey: ['history', user?.uid],
-        queryFn: () => convexApi.getHistory(token!),
+        queryFn: async () => {
+            const items = await convexApi.getHistory(token!);
+            return enrichHistoryPosters(items);
+        },
         enabled: !!user && !!token,
     });
 };
