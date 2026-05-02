@@ -74,16 +74,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setToken(convexSession.token);
   };
 
-  // Register: Django gets username explicitly, Convex gets email
+  // Register: Django uses the same derived username that login sends.
   const register = async (
     email: string,
     password: string,
     username: string,
     name?: string,
   ) => {
-    // Django registration — non-blocking
+    // Django registration is non-blocking so the existing Convex auth still works.
     try {
-      const djangoData = await djangoRegister(email, password, username, name);
+      const djangoUsername = email.includes("@") ? email.split("@")[0] : username;
+      const djangoData = await djangoRegister(email, password, djangoUsername, name);
       setDjangoToken(djangoData.token);
     } catch (e) {
       if (__DEV__) console.warn("Django register failed (non-blocking):", e);

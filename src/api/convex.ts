@@ -6,7 +6,8 @@ const SESSION_KEY = '@vibeo_convex_session';
 const requireEnv = (key: 'EXPO_PUBLIC_CONVEX_URL' | 'EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL') => {
     const value = process.env[key];
     if (!value) {
-        throw new Error(`${key} is not configured. Add it to your .env file.`);
+        if (__DEV__) console.warn(`${key} is not configured. Convex features will be unavailable.`);
+        return '';
     }
     return value;
 };
@@ -60,7 +61,13 @@ const request = async <T>(
     options: { method?: 'GET' | 'POST' | 'DELETE'; token?: string; body?: unknown } = {},
 ): Promise<T> => {
     const { method = 'POST', token, body } = options;
-    const response = await fetch(`${getBaseUrl()}${path}`, {
+    const baseUrl = getBaseUrl();
+
+    if (!baseUrl) {
+        throw new Error('Convex is not configured. Add EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL to your .env file.');
+    }
+
+    const response = await fetch(`${baseUrl}${path}`, {
         method,
         headers: {
             'Content-Type': 'application/json',
