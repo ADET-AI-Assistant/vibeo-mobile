@@ -3,7 +3,7 @@ import { HistoryItem, UserProfile, WatchlistItem } from '../types/user';
 
 const SESSION_KEY = '@vibeo_convex_session';
 
-const requireEnv = (key: 'EXPO_PUBLIC_CONVEX_URL' | 'EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL') => {
+const requireEnv = (key: 'EXPO_PUBLIC_CONVEX_URL' | 'EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL' | 'EXPO_PUBLIC_API_BASE_URL') => {
     const value = process.env[key];
     if (!value) {
         throw new Error(`${key} is not configured. Add it to your .env file.`);
@@ -57,10 +57,14 @@ const parseAuthSession = (payload: any): AuthSession => {
 
 const request = async <T>(
     path: string,
-    options: { method?: 'GET' | 'POST' | 'DELETE'; token?: string; body?: unknown } = {},
+    options: { method?: 'GET' | 'POST' | 'DELETE'; token?: string; body?: unknown; useDjango?: boolean } = {},
 ): Promise<T> => {
-    const { method = 'POST', token, body } = options;
-    const response = await fetch(`${getBaseUrl()}${path}`, {
+    const { method = 'POST', token, body, useDjango = false } = options;
+    const baseUrl = useDjango 
+        ? requireEnv('EXPO_PUBLIC_API_BASE_URL').replace(/\/+$/, '')
+        : getBaseUrl();
+
+    const response = await fetch(`${baseUrl}${path}`, {
         method,
         headers: {
             'Content-Type': 'application/json',
@@ -78,7 +82,14 @@ const request = async <T>(
     }
 
     if (!response.ok) {
-        throw new Error(data?.error || data?.message || `Convex request failed (${response.status})`);
+        let errorMessage = data?.error || data?.message || `Convex request failed (${response.status})`;
+        
+        // Clean up error message to be user-friendly (remove stack trace)
+        if (typeof errorMessage === 'string' && errorMessage.includes('Uncaught Error: ')) {
+            errorMessage = errorMessage.split('Uncaught Error: ')[1].split('\n')[0].trim();
+        }
+        
+        throw new Error(errorMessage);
     }
 
     return data as T;
@@ -130,22 +141,22 @@ export const convexApi = {
     },
 
     getWatchlist: async (token: string): Promise<WatchlistItem[]> => {
-        return request<WatchlistItem[]>('/watchlist', { method: 'GET', token });
+        return request<WatchlistItem[]>('/watchlist/', { method: 'GET', token, useDjango: true });
     },
 
     addToWatchlist: async (token: string, item: WatchlistItem): Promise<void> => {
-        await request('/watchlist/add', { token, body: item });
+        await request('/watchlist/', { method: 'POST', token, body: item, useDjango: true });
     },
 
     removeFromWatchlist: async (token: string, mediaId: number): Promise<void> => {
-        await request('/watchlist/remove', { token, body: { mediaId } });
+        await request(`/watchlist/${mediaId}/`, { method: 'DELETE', token, useDjango: true });
     },
 
     getHistory: async (token: string): Promise<HistoryItem[]> => {
-        return request<HistoryItem[]>('/history', { method: 'GET', token });
+        return request<HistoryItem[]>('/history/', { method: 'GET', token, useDjango: true });
     },
 
     updateHistory: async (token: string, item: HistoryItem): Promise<void> => {
-        await request('/history/upsert', { token, body: item });
+        await request('/history/', { method: 'POST', token, body: item, useDjango: true });
     },
 };
