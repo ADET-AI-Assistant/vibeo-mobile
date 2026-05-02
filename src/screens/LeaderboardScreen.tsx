@@ -67,6 +67,16 @@ const LeaderboardScreen = () => {
         setSyncSuccess(false);
 
         try {
+            await syncUserStats({
+                uid: user.uid,
+                displayName: user.name,
+                email: user.email,
+                totalWatchTime: Math.max(0, (history?.length || 0) * 180),
+                streakData: {
+                    current: history?.length ? 1 : 0,
+                    highest: history?.length ? 1 : 0,
+                },
+            });
             await loadLeaderboard();
             setSyncSuccess(true);
             setTimeout(() => setSyncSuccess(false), 3000);
